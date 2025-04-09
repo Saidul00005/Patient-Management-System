@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.contrib.auth.hashers import make_password
 from phonenumber_field.modelfields import PhoneNumberField
 from django.forms import ValidationError
+from encrypted_model_fields.fields import EncryptedCharField,EncryptedTextField,EncryptedDateField
 
 
 class Company(models.Model):
@@ -41,25 +42,25 @@ class CustomUser(AbstractUser):
     company = models.ForeignKey(
         Company, on_delete=models.CASCADE, null=True, blank=True
     )
-    user_role = models.CharField(
+    user_role =EncryptedCharField(
         max_length=100, choices=SUPERVISION_CHOICES, default="CLIENT"
     )
     # city = models.CharField(max_length=100, blank=True, null=True)
     specializations = models.CharField(max_length=100, blank=True, null=True)
     department = models.CharField(max_length=100, blank=True, null=True)
     # added 21_2_2024
-    city = models.CharField(max_length=100, blank=True, null=True)
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    email = models.CharField(max_length=256)
-    date_birth = models.DateField(blank=True, null=True)
-    address = models.CharField(max_length=100, blank=True, null=True)
-    postcode = models.CharField(max_length=100, blank=True, null=True)
-    gender = models.CharField(max_length=1, blank=True, choices=GENDER_CHOICE)
+    city = EncryptedCharField(max_length=100, blank=True, null=True)
+    first_name =EncryptedCharField(max_length=100)
+    last_name = EncryptedCharField(max_length=100)
+    email = EncryptedCharField(max_length=256)
+    date_birth = EncryptedDateField(blank=True, null=True)
+    address = EncryptedCharField(max_length=100, blank=True, null=True)
+    postcode = EncryptedCharField(max_length=100, blank=True, null=True)
+    gender =  EncryptedCharField(max_length=1, blank=True, choices=GENDER_CHOICE)
     phone_number = PhoneNumberField(null=True, blank=True)
-    gesy_number = models.CharField(max_length=100, null=True, blank=True)
-    id_card = models.CharField(max_length=50, null=True, blank=True, unique=True)
-    color = models.CharField(max_length=20, null=True, blank=True)
+    gesy_number =EncryptedCharField(max_length=100, null=True, blank=True)
+    id_card = EncryptedCharField(max_length=50, null=True, blank=True, unique=True)
+    color = EncryptedCharField(max_length=20, null=True, blank=True)
     objects = CustomUserManager()
 
     def save(self, *args, **kwargs):
@@ -92,6 +93,6 @@ class Admin(models.Model):
 
 class ClientComment(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    comment_text = models.TextField()
+    comment_text =EncryptedTextField()
     visibility = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)

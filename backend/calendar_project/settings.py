@@ -519,3 +519,5 @@ CORS_ALLOWED_ORIGINS = [
     "https://economidesbackend.ti-talostech.info",
     "https://economides.ti-talostech.info",
 ]
+
+FIELD_ENCRYPTION_KEY = os.environ.get("ENCRYPTED_MODEL_FIELDS_KEY", "uPCz7Gy3mE71hU08Q9f2HtTdQ1XFKLMp_gt9xvvPZpA=")
