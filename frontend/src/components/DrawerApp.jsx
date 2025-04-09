@@ -2329,7 +2329,7 @@ function DrawerApp() {
               }}
             >
               <Typography variant="h6" noWrap component="div">
-                {t("Patient Management System")}
+                {t("Patient Hub - A simple patient management system")}
               </Typography>
               <select
                 onChange={(e) => changeLanguage(e.target.value)}

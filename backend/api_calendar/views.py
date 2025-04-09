@@ -2979,7 +2979,7 @@ class GenerateUserPDF(APIView):
         # Page Title
         pdf.setFont("Helvetica-Bold", 16)
         pdf.setFillColor(colors.darkblue)
-        pdf.drawString(200, height - 80, "User Details Report")
+        pdf.drawString(200, height - 80, "Patient Details Report")
 
         # Draw a line under title
         pdf.setStrokeColor(colors.black)
@@ -3000,20 +3000,20 @@ class GenerateUserPDF(APIView):
             "Full Name": f"{user.first_name} {user.last_name}",
             "Email": user.email,
             "Role": "Patient",
-            "Company": user.company.name if user.company else "N/A",
-            "Specializations": user.specializations or "N/A",
-            "Department": user.department or "N/A",
-            "City": user.city or "N/A",
-            "Address": user.address or "N/A",
-            "Postcode": user.postcode or "N/A",
-            "Gender": user.get_gender_display() if user.gender else "N/A",
-            "Phone": user.phone_number if user.phone_number else "N/A",
+            #"Company": user.company.name if user.company else "N/A",
+            #"Specializations": user.specializations or "N/A",
+            #"Department": user.department or "N/A",
+            #"City": user.city or "Did not collect",
+            #"Address": user.address or "Did not collect",
+            #"Postcode": user.postcode or "Did not collect",
+            "Gender": user.get_gender_display() if user.gender else "Not provided",
+            "Phone": user.phone_number if user.phone_number else "Not provided",
             "Date of Birth": (
-                user.date_birth.strftime("%Y-%m-%d") if user.date_birth else "N/A"
+                user.date_birth.strftime("%Y-%m-%d") if user.date_birth else "Not provided"
             ),
-            "GESY Number": user.gesy_number or "N/A",
-            "ID Card": user.id_card or "N/A",
-            "Color Code": user.color or "N/A",
+            #"GESY Number": user.gesy_number or "Did not collect",
+            #"ID Card": user.id_card or "Did not collect",
+            #"Color Code": user.color or "Did not collect",
         }
 
         # Draw the user details in key-value format

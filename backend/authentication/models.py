@@ -8,8 +8,8 @@ from encrypted_model_fields.fields import EncryptedCharField,EncryptedTextField,
 
 class Company(models.Model):
     name = models.CharField(max_length=100)
-    address = models.CharField(max_length=100, blank=True, null=True)
-    contact_person = models.CharField(max_length=100, blank=True, null=True)
+    address =EncryptedCharField(max_length=100, blank=True, null=True)
+    contact_person = EncryptedCharField(max_length=100, blank=True, null=True)
 
 
 class CustomUserManager(BaseUserManager):
@@ -42,22 +42,25 @@ class CustomUser(AbstractUser):
     company = models.ForeignKey(
         Company, on_delete=models.CASCADE, null=True, blank=True
     )
-    user_role =EncryptedCharField(
+    user_role =models.CharField(
         max_length=100, choices=SUPERVISION_CHOICES, default="CLIENT"
     )
-    # city = models.CharField(max_length=100, blank=True, null=True)
-    specializations = models.CharField(max_length=100, blank=True, null=True)
-    department = models.CharField(max_length=100, blank=True, null=True)
-    # added 21_2_2024
-    city = EncryptedCharField(max_length=100, blank=True, null=True)
+ 
+    # Common fields for all users
     first_name =EncryptedCharField(max_length=100)
     last_name = EncryptedCharField(max_length=100)
     email = EncryptedCharField(max_length=256)
+    phone_number = PhoneNumberField(null=True, blank=True)
+    gender =  EncryptedCharField(max_length=1, blank=True, choices=GENDER_CHOICE,null=True)
     date_birth = EncryptedDateField(blank=True, null=True)
+
+
+    # Fields only for STAFF (Doctors) and ADMIN (Secretaries)
+    city = EncryptedCharField(max_length=100, blank=True, null=True)
+    specializations = EncryptedCharField(max_length=100, blank=True, null=True)
+    department = EncryptedCharField(max_length=100, blank=True, null=True)
     address = EncryptedCharField(max_length=100, blank=True, null=True)
     postcode = EncryptedCharField(max_length=100, blank=True, null=True)
-    gender =  EncryptedCharField(max_length=1, blank=True, choices=GENDER_CHOICE)
-    phone_number = PhoneNumberField(null=True, blank=True)
     gesy_number =EncryptedCharField(max_length=100, null=True, blank=True)
     id_card = EncryptedCharField(max_length=50, null=True, blank=True, unique=True)
     color = EncryptedCharField(max_length=20, null=True, blank=True)
@@ -67,6 +70,17 @@ class CustomUser(AbstractUser):
         # if self.pk is None:
         #     if self.company is None and not self.is_superuser:
         #         raise ValidationError({'company': ["Required Field"]})
+
+        if self.user_role == "CLIENT":  # Patient
+            self.specializations = None
+            self.department = None
+            self.address = None
+            self.postcode = None
+            self.city = None
+            self.id_card = None
+            self.gesy_number = None
+            self.color = None
+            
         super().save(*args, **kwargs)
 
 
