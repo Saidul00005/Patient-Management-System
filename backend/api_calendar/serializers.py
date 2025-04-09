@@ -175,15 +175,23 @@ class CustomUserSerializer(serializers.ModelSerializer):
         return data
 
     def validate_id_card(self, value):
-        if value and CustomUser.objects.filter(id_card=value).exists():
-            raise serializers.ValidationError("ID card number must be unique.")
+
+        if value and self.initial_data.get("user_role") != "CLIENT":
+            if CustomUser.objects.filter(id_card=value).exists():
+                raise serializers.ValidationError("ID card number must be unique.")
         return value
+
 
     def validate(self, data):
         validated_data = data.copy()
         password = data.get("password", "")
         if password:
             validated_data["password"] = make_password(password)
+
+        if 'user_role' not in validated_data or not validated_data['user_role']:
+            raise serializers.ValidationError(
+                {"user_role": "Role is required"})
+                
         user_role = validated_data.get("user_role")
         phone_number = validated_data.get("phone_number", None)
         id_card = validated_data.get("id_card", None)
@@ -194,25 +202,44 @@ class CustomUserSerializer(serializers.ModelSerializer):
             validated_data["is_superuser"] = True
         if user_role == "STAFF" or user_role == "ADMIN":
             validated_data["is_staff"] = True
-        if user_role == "CLIENT" and not phone_number:
-            raise serializers.ValidationError(
-                {"phone_number": "Required field for clients"}
-            )
-        if user_role == "CLIENT" and not id_card:
-            raise serializers.ValidationError({"id_card": "Required field for clients"})
+        # if user_role == "CLIENT" and not phone_number:
+        #     raise serializers.ValidationError(
+        #         {"phone_number": "Required field for clients"}
+        #     )
+        # if user_role == "CLIENT" and not id_card:
+        #     raise serializers.ValidationError({"id_card": "Required field for clients"})
+
+        if user_role == "CLIENT":
+            if not phone_number:
+                raise serializers.ValidationError(
+                    {"phone_number": "Required field for patients"}
+                )
+        else:
+            if not validated_data.get("id_card"):
+                raise serializers.ValidationError(
+                    {"id_card": "Required field for doctors/secretaries"}
+                )
 
         return validated_data
 
     def create(self, validated_data):
-        user_role = validated_data.get("user_role", "CLIENT")
+        user_role = validated_data.get("user_role")
         color = validated_data.pop("color", None)
+        # Remove non-patient fields for CLIENT role
+        if user_role == "CLIENT":
+            for field in ["id_card", "city", "address", "postcode", "gesy_number"]:
+                validated_data.pop(field, None)
+
         user = CustomUser.objects.create(**validated_data)
         if user_role == "ADMIN":
             Admin.objects.create(user=user)
         elif user_role == "STAFF":
             Staff.objects.create(user=user)
-            user.color = color
-            user.save()
+            # user.color = color
+            # user.save()
+            if color:  # Only set color if provided
+                user.color = color
+                user.save()
         elif user_role == "CLIENT":
             Client.objects.create(user=user)
         return user
@@ -246,7 +273,13 @@ class CustomUserSerializer(serializers.ModelSerializer):
             "password": {"write_only": True},
             "is_superuser": {"read_only": True},
             "is_staff": {"read_only": True},
-            "company": {"required": True, "write_only": True},
+            "user_role": {"required": True},
+            "company": {"required": False,},
+            "city": {"required": False},
+            "address": {"required": False},
+            "postcode": {"required": False},
+            "gesy_number": {"required": False},
+            "color": {"required": False},
         }
 
 

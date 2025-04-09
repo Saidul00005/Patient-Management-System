@@ -253,6 +253,8 @@ import { SketchPicker } from "react-color";
 import axiosClient from "../axiosClient";
 import { useTranslation } from "react-i18next";
 import PhoneField from "../components/PhoneField";
+import { IconButton} from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const UserForm = () => {
   const nameRef = useRef(null);
@@ -279,6 +281,11 @@ const UserForm = () => {
 
   const { token } = useStateContext();
   const { t } = useTranslation();
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -290,21 +297,23 @@ const UserForm = () => {
     // }
 
     const payload = {
+      user_role: role,
       username: usernameRef.current.value,
       password: passwordRef.current.value,
-      id_card: cardNumberRef.current.value,
-      user_role: role,
       first_name: nameRef.current.value,
       last_name: surnameRef.current.value,
       email: emailRef.current.value,
       date_birth: dateRef.current.value,
       gender: gender,
-      city: cityRef.current.value,
-      address: addressRef.current.value,
-      postcose: postalRef.current.value,
       phone_number: phoneNumber,
-      color: color,
-      gesy_number: gesyNumberRef.current.value,
+      ...(role !== "CLIENT" && {
+        id_card: cardNumberRef.current?.value || "", 
+        city: cityRef.current?.value || "",
+        address: addressRef.current?.value || "",
+        postcode: postalRef.current?.value || "",
+        gesy_number: gesyNumberRef.current?.value || "",
+        ...(role === "STAFF" && { color: color }), 
+      }),
     };
 
     axiosClient
@@ -323,19 +332,26 @@ const UserForm = () => {
         setError();
         usernameRef.current.value = null;
         passwordRef.current.value = null;
-        cardNumberRef.current.value = null;
+        // cardNumberRef.current.value = null;
+        if (cardNumberRef.current) cardNumberRef.current.value = null;
         setRole("");
         nameRef.current.value = null;
         surnameRef.current.value = null;
         emailRef.current.value = null;
         dateRef.current.value = null;
         setGender("");
-        cityRef.current.value = null;
-        addressRef.current.value = null;
-        postalRef.current.value = null;
-        gesyNumberRef.current.value = null;
+        // cityRef.current.value = null;
+        // addressRef.current.value = null;
+        // postalRef.current.value = null;
+        // gesyNumberRef.current.value = null;
+        if (cityRef.current) cityRef.current.value = null;
+        if (addressRef.current) addressRef.current.value = null;
+        if (postalRef.current) postalRef.current.value = null;
+        if (gesyNumberRef.current) gesyNumberRef.current.value = null;
 
         setError({});
+        setPhone("+357"); // Reset phone input if needed
+        setColor(""); // Reset color if applicable
       })
       .catch((err) => {
         const allIssues = Object.keys(err.response?.data);
@@ -377,184 +393,8 @@ const UserForm = () => {
           {t("Information")}
         </Typography>
         <form onSubmit={handleSubmit}>
-          <Box sx={{ "& .MuiTextField-root": { marginBottom: "1rem" } }}>
-            <TextField
-              fullWidth
-              label={t("Name")}
-              variant="outlined"
-              inputRef={nameRef}
-              onChange={(e) => setErrors({ ...errors, first_name: "" })}
-            />
-            {errors?.first_name && (
-              <Typography
-                sx={{ textAlign: "left", mb: 2 }}
-                color="error"
-                variant="body1"
-              >
-                {errors?.first_name}
-              </Typography>
-            )}
-            <TextField
-              fullWidth
-              label={t("Surname")}
-              variant="outlined"
-              inputRef={surnameRef}
-              onChange={(e) => setErrors({ ...errors, last_name: "" })}
-            />
-            {errors?.last_name && (
-              <Typography
-                sx={{ textAlign: "left", mb: 2 }}
-                color="error"
-                variant="body1"
-              >
-                {errors?.last_name}
-              </Typography>
-            )}
-            <TextField
-              fullWidth
-              type="date"
-              label={t("Date of Birth")}
-              variant="outlined"
-              InputLabelProps={{ shrink: true }}
-              inputRef={dateRef}
-              onChange={(e) => setErrors({ ...errors, date_birth: "" })}
-            />
-            {errors?.date_birth && (
-              <Typography
-                sx={{ textAlign: "left", mb: 2 }}
-                color="error"
-                variant="body1"
-              >
-                {errors?.date_birth}
-              </Typography>
-            )}
-            <TextField
-              fullWidth
-              label={t("GESY NUMBER")}
-              variant="outlined"
-              inputRef={gesyNumberRef}
-            />
-            <TextField
-              fullWidth
-              label={t("Address")}
-              variant="outlined"
-              inputRef={addressRef}
-            />
-            <TextField
-              fullWidth
-              label={t("Postal code")}
-              variant="outlined"
-              inputRef={postalRef}
-            />
-            <TextField
-              fullWidth
-              label={t("City")}
-              variant="outlined"
-              inputRef={cityRef}
-            />
-            <PhoneField phone={phone} setPhone={setPhone} />
-
-            {errors?.phone_number && (
-              <Typography
-                sx={{ textAlign: "left", mb: 2 }}
-                color="error"
-                variant="body1"
-              >
-                {errors?.phone_number}
-              </Typography>
-            )}
-
-            <TextField
-              fullWidth
-              label={t("ID Number")}
-              variant="outlined"
-              inputRef={cardNumberRef}
-              onChange={(e) => setErrors({ ...errors, id_card: "" })}
-            />
-            {errors?.id_card && (
-              <Typography
-                sx={{ textAlign: "left", mb: 2 }}
-                color="error"
-                variant="body1"
-              >
-                {errors?.id_card}
-              </Typography>
-            )}
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <FormLabel component="legend" sx={{ marginRight: "1rem" }}>
-                {t("Gender")}
-              </FormLabel>
-              <FormControl component="fieldset">
-                <RadioGroup
-                  name="gender"
-                  value={gender}
-                  onChange={handleGenderChange}
-                  sx={{ flexDirection: "row" }}
-                >
-                  <FormControlLabel
-                    value="M"
-                    control={<Radio />}
-                    label={t("Male")}
-                  />
-                  <FormControlLabel
-                    value="F"
-                    control={<Radio />}
-                    label={t("Female")}
-                  />
-                </RadioGroup>
-              </FormControl>
-            </Box>
-            <TextField
-              fullWidth
-              label={t("Email")}
-              variant="outlined"
-              type="email"
-              inputRef={emailRef}
-              onChange={(e) => setErrors({ ...errors, email: "" })}
-            />
-            {errors?.email && (
-              <Typography
-                sx={{ textAlign: "left", mb: 2 }}
-                color="error"
-                variant="body1"
-              >
-                {errors?.email}
-              </Typography>
-            )}
-            <TextField
-              fullWidth
-              label={t("Username")}
-              variant="outlined"
-              inputRef={usernameRef}
-              onChange={(e) => setErrors({ ...errors, username: "" })}
-            />
-            {errors?.username && (
-              <Typography
-                sx={{ textAlign: "left", mb: 2 }}
-                color="error"
-                variant="body1"
-              >
-                {errors?.username}
-              </Typography>
-            )}
-            <TextField
-              fullWidth
-              label={t("Password")}
-              variant="outlined"
-              inputRef={passwordRef}
-              onChange={(e) => setErrors({ ...errors, password: "" })}
-            />
-            {errors?.password && (
-              <Typography
-                sx={{ textAlign: "left", mb: 2 }}
-                color="error"
-                variant="body1"
-              >
-                {errors?.password}
-              </Typography>
-            )}
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <FormLabel component="legend" sx={{ marginRight: "1rem" }}>
+        <Box sx={{ display: "flex", alignItems: "center" }} >
+              <FormLabel component="legend" required sx={{ marginRight: "1rem", '& .MuiFormLabel-asterisk': { color: 'red' } }}>
                 {t("Role")}
               </FormLabel>
               <FormControl component="fieldset">
@@ -589,6 +429,245 @@ const UserForm = () => {
                 variant="body1"
               >
                 {errors?.user_role}
+              </Typography>
+            )}
+          <Box sx={{ "& .MuiTextField-root": { marginBottom: "1rem" } }}>
+            <TextField
+              fullWidth
+              label={t("Name")}
+              variant="outlined"
+              required
+              InputLabelProps={{
+                sx: {
+                  "& .MuiFormLabel-asterisk": { color: "red" }
+                }
+              }}
+              inputRef={nameRef}
+              onChange={(e) => setErrors({ ...errors, first_name: "" })}
+            />
+            {errors?.first_name && (
+              <Typography
+                sx={{ textAlign: "left", mb: 2 }}
+                color="error"
+                variant="body1"
+              >
+                {errors?.first_name}
+              </Typography>
+            )}
+            <TextField
+              fullWidth
+              label={t("Surname")}
+              variant="outlined"
+              required
+              InputLabelProps={{
+                sx: {
+                  "& .MuiFormLabel-asterisk": { color: "red" }
+                }
+              }}
+              inputRef={surnameRef}
+              onChange={(e) => setErrors({ ...errors, last_name: "" })}
+            />
+            {errors?.last_name && (
+              <Typography
+                sx={{ textAlign: "left", mb: 2 }}
+                color="error"
+                variant="body1"
+              >
+                {errors?.last_name}
+              </Typography>
+            )}
+            <TextField
+              fullWidth
+              type="date"
+              label={t("Date of Birth")}
+              variant="outlined"
+              required
+              InputLabelProps={{
+                sx: {
+                  "& .MuiFormLabel-asterisk": { color: "red" }
+                },
+                shrink: true 
+              }}
+              inputRef={dateRef}
+              onChange={(e) => setErrors({ ...errors, date_birth: "" })}
+            />
+            {errors?.date_birth && (
+              <Typography
+                sx={{ textAlign: "left", mb: 2 }}
+                color="error"
+                variant="body1"
+              >
+                {errors?.date_birth}
+              </Typography>
+            )}
+            {role !== "CLIENT" && (
+            <>
+            <TextField
+              fullWidth
+              label={t("GESY NUMBER")}
+              variant="outlined"
+              inputRef={gesyNumberRef}
+            />
+            <TextField
+              fullWidth
+              label={t("Address")}
+              variant="outlined"
+              inputRef={addressRef}
+            />
+            <TextField
+              fullWidth
+              label={t("Postal code")}
+              variant="outlined"
+              inputRef={postalRef}
+            />
+            <TextField
+              fullWidth
+              label={t("City")}
+              variant="outlined"
+              inputRef={cityRef}
+            />
+            </>
+            )}
+            <PhoneField phone={phone} setPhone={setPhone} required/>
+
+            {errors?.phone_number && (
+              <Typography
+                sx={{ textAlign: "left", mb: 2 }}
+                color="error"
+                variant="body1"
+              >
+                {errors?.phone_number}
+              </Typography>
+            )}
+           {role !== "CLIENT" && (
+            <>
+            <TextField
+              fullWidth
+              label={t("ID Number")}
+              variant="outlined"
+              required
+              InputLabelProps={{
+                sx: {
+                  "& .MuiFormLabel-asterisk": { color: "red" }
+                }
+              }}
+              inputRef={cardNumberRef}
+              onChange={(e) => setErrors({ ...errors, id_card: "" })}
+            />
+            {errors?.id_card && (
+              <Typography
+                sx={{ textAlign: "left", mb: 2 }}
+                color="error"
+                variant="body1"
+              >
+                {errors?.id_card}
+              </Typography>
+            )}
+            </>
+           )}
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <FormLabel component="legend" sx={{ marginRight: "1rem" }}>
+                {t("Gender")}
+              </FormLabel>
+              <FormControl component="fieldset">
+                <RadioGroup
+                  name="gender"
+                  value={gender}
+                  onChange={handleGenderChange}
+                  sx={{ flexDirection: "row" }}
+                >
+                  <FormControlLabel
+                    value="M"
+                    control={<Radio />}
+                    label={t("Male")}
+                  />
+                  <FormControlLabel
+                    value="F"
+                    control={<Radio />}
+                    label={t("Female")}
+                  />
+                </RadioGroup>
+              </FormControl>
+            </Box>
+            <TextField
+              fullWidth
+              label={t("Email")}
+              variant="outlined"
+              required
+              InputLabelProps={{
+                sx: {
+                  "& .MuiFormLabel-asterisk": { color: "red" }
+                }
+              }}
+              type="email"
+              inputRef={emailRef}
+              onChange={(e) => setErrors({ ...errors, email: "" })}
+            />
+            {errors?.email && (
+              <Typography
+                sx={{ textAlign: "left", mb: 2 }}
+                color="error"
+                variant="body1"
+              >
+                {errors?.email}
+              </Typography>
+            )}
+            <TextField
+              fullWidth
+              label={t("Username")}
+              variant="outlined"
+              required
+              InputLabelProps={{
+                sx: {
+                  "& .MuiFormLabel-asterisk": { color: "red" }
+                }
+              }}
+              inputRef={usernameRef}
+              onChange={(e) => setErrors({ ...errors, username: "" })}
+            />
+            {errors?.username && (
+              <Typography
+                sx={{ textAlign: "left", mb: 2 }}
+                color="error"
+                variant="body1"
+              >
+                {errors?.username}
+              </Typography>
+            )}
+            <TextField
+              fullWidth
+              label={t("Password") + " *"}
+              variant="outlined"
+              required
+              InputLabelProps={{
+                sx: {
+                  "& .MuiFormLabel-asterisk": { color: "red" }
+                }
+              }}
+              type={showPassword ? "text" : "password"}
+              inputRef={passwordRef}
+              onChange={(e) => setErrors({ ...errors, password: "" })}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+            />
+            {errors?.password && (
+              <Typography
+                sx={{ textAlign: "left", mb: 2 }}
+                color="error"
+                variant="body1"
+              >
+                {errors?.password}
               </Typography>
             )}
 

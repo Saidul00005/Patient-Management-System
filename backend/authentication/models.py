@@ -43,7 +43,7 @@ class CustomUser(AbstractUser):
         Company, on_delete=models.CASCADE, null=True, blank=True
     )
     user_role =models.CharField(
-        max_length=100, choices=SUPERVISION_CHOICES, default="CLIENT"
+        max_length=100, choices=SUPERVISION_CHOICES
     )
  
     # Common fields for all users
