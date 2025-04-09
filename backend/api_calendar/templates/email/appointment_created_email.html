@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Appointment Created</title>
+</head>
+<body>
+    <p>Dear {{ appointment.client.user.first_name }},</p>
+    <!-- <p>Your appointment has been created.</p> -->
+    <p>Your appointment with Dr.{{ appointment.staff.user.first_name }} {{ appointment.staff.user.last_name }} has been created.</p> 
+    <p><strong>Date:</strong> {{ appointment.appointment_date }}</p>
+    <p><strong>Start Time:</strong> {{ appointment.appointment_start }}</p>
+    <p><strong>End Time:</strong> {{ appointment.appointment_end }}</p>
+    <p>Thank you!</p>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!-- Your HTML template -->
+<button id="call-function">Download Data</button>
+
+<script>
+
+document.getElementById('call-function').addEventListener('click', function() {
+    console.log("function is called");
+    fetch('http://127.0.0.1:8000/api/excel_document_of_appointments/', {
+        method: 'GET',
+        headers: {
+            'Authorization': 'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzA5OTAzMjI4LCJpYXQiOjE3MDkwMzkyMjgsImp0aSI6ImQzODNiODQ1ZmZkODRhODQ5ZGExMjM0ZWI4MGIzZGVkIiwidXNlcl9pZCI6MjN9.VTB0wS-tZqu4QeNDIGKoLdxrGlYL3LBW8_EDbHPU3bw',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log(data);
+        // Handle response as needed
+    })
+    .catch(error => console.error('Error:', error));
+});
+
+</script>

@@ -1,0 +1,58 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+/* index.css */
+.react-calendar {
+  height: 100% !important;
+}
+/* Reduce padding and margins */
+.react-calendar {
+  width: 250px !important; /* Smaller calendar width */
+  max-width: 100%;
+  font-size: 12px; /* Reduce font size */
+}
+
+.react-calendar__tile {
+  padding: 4px !important; /* Reduce tile padding */
+  font-size: 12px !important; /* Smaller button text */
+}
+
+.react-calendar__month-view__days__day {
+  min-width: 24px !important;
+  min-height: 24px !important;
+}
+
+/* Make navigation buttons smaller */
+.react-calendar__navigation button {
+  font-size: 12px !important;
+  padding: 4px 6px !important;
+  min-width: 24px !important;
+}
+/* Add your other global styles here */
+
+/* Styles for the AssignedClientStats component */
+.input-container {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.input-container h2 {
+  margin-right: 10px;
+}
+
+input {
+  padding: 5px;
+  font-size: 1rem;
+}
