@@ -2017,16 +2017,21 @@ import { LegendToggle, Note } from "@mui/icons-material";
 import AppointmentList from "../screens/AppointmentList";
 import Notes from "../screens/Notes";
 import axiosClient from "../axiosClient";
+import GDPRPOLICY from "../screens/GdprPolicyScreen";
 // import TaskManagement from "../screens/TaskManagement";
+import Modal from "@mui/material/Modal";
+
 
 function DrawerApp() {
   const drawerWidth = 240;
-  const { user, _setUser, setToken } = useStateContext();
+  const { user, _setUser, setToken, token } = useStateContext();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   // const [view, setView] = useState("appointments");
   const [selectedAppointmentId, setSelectedAppointmentId] = useState(null);
   // const [selectedUserId, setSelectedUserId] = useState(null);
+  const [showGDPRModal, setShowGDPRModal] = useState(false);
+  const [isSubmittingAgreement, setIsSubmittingAgreement] = useState(false);
 
   const { view, setView } = useStateContext();
 
@@ -2035,6 +2040,13 @@ function DrawerApp() {
   useEffect(() => {
     // needs api get call to give token from headers authorization and give back the details of the user to be correct on the refresh
   }, []);
+
+  useEffect(() => {
+    if (user?.user_role === 'CLIENT' && !user.gdpr_accepted) {
+      setShowGDPRModal(true);
+    }
+  }, [user]);
+  
 
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
@@ -2101,8 +2113,68 @@ function DrawerApp() {
   // };
   const [submenuOpen, setSubmenuOpen] = useState(false); // State to handle submenu open/close
 
+  const handleGDPRAgreement = async () => {
+    setIsSubmittingAgreement(true);
+    try {
+      // Get client IP
+      const ipRes = await fetch('https://api.ipify.org?format=json');
+      const { ip } = await ipRes.json();
+      
+      // Send agreement to backend
+      await axiosClient.post('/api/gdpr/accept/', {
+        ip_address: ip,
+        agreement_time: new Date().toISOString()
+      },{
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "*/*",
+          Authorization: `JWT-${token}`,
+        },
+      });
+  
+      // Update user context
+      _setUser({ ...user, gdpr_accepted: true });
+      setShowGDPRModal(false);
+    } catch (err) {
+      if (err.response && err.response.data) {
+        alert(err.response.data[0] || 'Failed to accept GDPR.');
+      } else {
+        console.error('GDPR agreement failed:', err);
+      }
+    } finally {
+      setIsSubmittingAgreement(false);
+    }
+  };
+
   const drawer = (
-    <div>
+      <div>
+      {showGDPRModal && (
+      <Modal
+        open={showGDPRModal}
+        onClose={() => {}}
+        disableEscapeKeyDown
+      >
+        <Box sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '90%',
+          maxWidth: 800,
+          maxHeight: '90vh',
+          bgcolor: 'background.paper',
+          boxShadow: 24,
+          p: 4,
+          overflowY: 'auto',
+        }}>
+          <GDPRPOLICY 
+            onAgree={handleGDPRAgreement}
+            isModal={true}
+            isSubmitting={isSubmittingAgreement}
+          />
+        </Box>
+      </Modal>
+      )}
       <Box
         sx={{
           display: "flex",
@@ -2209,6 +2281,15 @@ function DrawerApp() {
             },
             canSee: ["CLIENT"],
           },
+          {
+            name: `${t("GDPR POLICY")}`,
+            icon: <Note />,
+            handleClick: () => {
+              setView("gdpr_policy");
+            },
+            canSee: ["ADMIN","STAFF","CLIENT"],
+          },
+
 
           // {
           //   name: `${t("Task Management")}`,
@@ -2428,11 +2509,14 @@ function DrawerApp() {
           // )
           view === "search_users" ? (
             <SearchUsers />
+          ): view === "gdpr_policy" ? (
+            <GDPRPOLICY/>
           ) : (
             <Typography variant="h4">Oops something went wrong!</Typography>
           )}
         </Box>
       </Box>
+      
     </div>
   );
 }

@@ -1,6 +1,7 @@
 {
   "Login": "ΣΥΝΔΕΣΗ",
   "Appointments": "ΡΑΝΤΕΒΟΥ",
+  "MY Appointments": "ΡΑΝΤΕΒΟΥ ΜΟΥ",
   "Users": "ΧΡΗΣΤΕΣ",
   "new_user": "ΝΕΟΣ ΧΡΗΣΤΗΣ ",
   "Clients to staff": "ΑΝΑΘΕΣΗ ΑΣΘΕΝΗ ΣΕ ΓΙΑΤΡΟ",
@@ -100,5 +101,6 @@
   "Sign In": "ΣΥΝΔΕΣΗ",
   "Notes": "ΣΗΜΕΙΩΣΕΙΣ",
   "Task Management": "ΔΙΑΧΕΙΡΙΣΗ ΕΡΓΑΣΙΩΝ",
-  "Monitoring": "ΕΠΙΒΛΕΨΕΙ"
+  "Monitoring": "ΕΠΙΒΛΕΨΕΙ",
+  "GDPR POLICY": "ΠΟΛΙΤΙΚΗ GDPR"
 }

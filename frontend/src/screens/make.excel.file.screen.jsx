@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Typography from "@mui/material/Typography";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import CircularProgress from "@mui/material/CircularProgress";
 import axiosClient from "../axiosClient";
 import * as XLSX from "xlsx";
 import {
@@ -13,7 +13,7 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import { Card, Paper, TableBody } from "@material-ui/core";
+import { Card, Paper, TableBody } from "@mui/material";
 
 function MakeExcelFile() {
   const [message, setMessage] = useState("Loading Excel data...");

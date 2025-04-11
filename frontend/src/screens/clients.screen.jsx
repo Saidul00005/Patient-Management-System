@@ -166,6 +166,7 @@ const Clients = () => {
     axiosClient
       .get("api/print_all_users/", { params: params })
       .then((data) => {
+        console.log(data.data.custom_users);  
         setUsers(data.data.custom_users);
       })
       .catch((err) => {
@@ -363,6 +364,30 @@ const Clients = () => {
                         {t("ID NUMBER")}
                       </Typography>
                     </TableCell>
+                    <TableCell>
+                      <Typography
+                        variant="h7"
+                        sx={{ fontWeight: "bold", whiteSpace: "nowrap" }}
+                      >
+                        {t("Agreed to GDPR Policy?")}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography
+                        variant="h7"
+                        sx={{ fontWeight: "bold", whiteSpace: "nowrap" }}
+                      >
+                        {t("GDPR Policy Agreement Date")}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography
+                        variant="h7"
+                        sx={{ fontWeight: "bold", whiteSpace: "nowrap" }}
+                      >
+                        {t("Recorded IP Address on time of GDPR Policy Agreement")}
+                      </Typography>
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -395,6 +420,19 @@ const Clients = () => {
                       <TableCell>{row?.assigned_staff?.name}</TableCell>
                       <TableCell>{row.id}</TableCell>
                       <TableCell>{row.id_card || "  "}</TableCell>
+                      <TableCell>
+                        {row.gdpr_accepted ? "Yes" : "No"}
+                      </TableCell>
+                      <TableCell>
+                        {row.gdpr_accepted
+                          ? row.gdpr_agreement_date
+                          : "Not Accepted"}
+                      </TableCell>
+                      <TableCell>
+                        {row.gdpr_accepted
+                          ? row.gdpr_ip
+                          : "Not Accepted"}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

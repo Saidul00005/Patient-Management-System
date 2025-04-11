@@ -191,4 +191,5 @@ urlpatterns = [
     path("send-task-email/", SendTaskEmailAPIView.as_view()),
     path("task-comment/", TaskCommentView.as_view()),
     path("gdpr-report/", GenerateUserPDF.as_view()),
+    path("gdpr/accept/", GDPRAcceptView.as_view(), name="gdpr_accept"),
 ]

@@ -11,7 +11,7 @@ from authentication.models import CustomUser
 from .serializers import AdminSerializer, CustomUserSerializer
 from authentication.models import Admin
 from .models import Client, Staff, Appointment, AppointmentSendInfo, SendType
-from .serializers import ClientSerializer, StaffSerializer
+from .serializers import ClientSerializer, StaffSerializer, GDPRAcceptSerializer
 from django.conf import settings
 from .filters import UserSearchFilter
 
@@ -52,6 +52,21 @@ User = get_user_model()
 ######################################
 # from .permissions import IsAdminOrStaff  # Ensure this is defined in your permissions
 # from .filters import UserSearchFilter  # Ensure this is your custom filter
+
+
+class GDPRAcceptView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = GDPRAcceptSerializer
+
+    def post(self, request):
+        user = request.user
+        serializer = GDPRAcceptSerializer(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"message": "GDPR acceptance recorded."}, status=status.HTTP_200_OK
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CompanyView(APIView):
@@ -3000,20 +3015,22 @@ class GenerateUserPDF(APIView):
             "Full Name": f"{user.first_name} {user.last_name}",
             "Email": user.email,
             "Role": "Patient",
-            #"Company": user.company.name if user.company else "N/A",
-            #"Specializations": user.specializations or "N/A",
-            #"Department": user.department or "N/A",
-            #"City": user.city or "Did not collect",
-            #"Address": user.address or "Did not collect",
-            #"Postcode": user.postcode or "Did not collect",
+            # "Company": user.company.name if user.company else "N/A",
+            # "Specializations": user.specializations or "N/A",
+            # "Department": user.department or "N/A",
+            # "City": user.city or "Did not collect",
+            # "Address": user.address or "Did not collect",
+            # "Postcode": user.postcode or "Did not collect",
             "Gender": user.get_gender_display() if user.gender else "Not provided",
             "Phone": user.phone_number if user.phone_number else "Not provided",
             "Date of Birth": (
-                user.date_birth.strftime("%Y-%m-%d") if user.date_birth else "Not provided"
+                user.date_birth.strftime("%Y-%m-%d")
+                if user.date_birth
+                else "Not provided"
             ),
-            #"GESY Number": user.gesy_number or "Did not collect",
-            #"ID Card": user.id_card or "Did not collect",
-            #"Color Code": user.color or "Did not collect",
+            # "GESY Number": user.gesy_number or "Did not collect",
+            # "ID Card": user.id_card or "Did not collect",
+            # "Color Code": user.color or "Did not collect",
         }
 
         # Draw the user details in key-value format

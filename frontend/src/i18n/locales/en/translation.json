@@ -1,6 +1,7 @@
 {
   "Login": "LOGIN",
   "Appointments": "APPOINTMENTS",
+  "MY Appointments": "MY APPOINTMENTS",
   "Users": "USERS",
   "new_user": "NEW USER",
   "Clients to staff": "PATIENT ASSIGNMENT TO DOCTOR",
@@ -100,5 +101,6 @@
   "Sign In": "SIGN IN",
   "Notes": "NOTES",
   "Task Management": "TASK MANAGEMENT",
-  "Monitoring": "MONITORING"
+  "Monitoring": "MONITORING",
+  "GDPR POLICY": "GDPR POLICY"
 }

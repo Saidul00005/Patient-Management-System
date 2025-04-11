@@ -33,6 +33,28 @@ from rest_framework.exceptions import PermissionDenied
 # logger = logging.getLogger(__name__)
 
 
+class GDPRAcceptSerializer(serializers.ModelSerializer):
+    ip_address = serializers.CharField(write_only=True)
+    agreement_time = serializers.DateTimeField(write_only=True)
+
+    class Meta:
+        model = CustomUser
+        fields = ["ip_address", "agreement_time"]
+
+    def validate(self, attrs):
+        user = self.instance
+        if user.gdpr_accepted:
+            raise serializers.ValidationError("GDPR policy already accepted.")
+        return attrs
+
+    def update(self, instance, validated_data):
+        instance.gdpr_accepted = True
+        instance.gdpr_ip = validated_data["ip_address"]
+        instance.gdpr_agreement_date = validated_data["agreement_time"]
+        instance.save()
+        return instance
+
+
 class CompanySerializer(serializers.Serializer):
     name = serializers.SerializerMethodField(read_only=True)
 
@@ -156,7 +178,10 @@ class CustomUserSerializer(serializers.ModelSerializer):
         ]
     )
     date_birth = serializers.DateField(
-        required=False, allow_null= True,format="%Y-%m-%d", input_formats=["%Y-%m-%d", "iso-8601"]
+        required=False,
+        allow_null=True,
+        format="%Y-%m-%d",
+        input_formats=["%Y-%m-%d", "iso-8601"],
     )
 
     assigned_staff = serializers.SerializerMethodField()
@@ -181,17 +206,15 @@ class CustomUserSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("ID card number must be unique.")
         return value
 
-
     def validate(self, data):
         validated_data = data.copy()
         password = data.get("password", "")
         if password:
             validated_data["password"] = make_password(password)
 
-        if 'user_role' not in validated_data or not validated_data['user_role']:
-            raise serializers.ValidationError(
-                {"user_role": "Role is required"})
-                
+        if "user_role" not in validated_data or not validated_data["user_role"]:
+            raise serializers.ValidationError({"user_role": "Role is required"})
+
         user_role = validated_data.get("user_role")
         phone_number = validated_data.get("phone_number", None)
         id_card = validated_data.get("id_card", None)
@@ -267,16 +290,24 @@ class CustomUserSerializer(serializers.ModelSerializer):
             "color",
             "assigned_staff",
             "gesy_number",
+            "gdpr_accepted",
+            "gdpr_agreement_date",
+            "gdpr_ip",
         ]
         extra_kwargs = {
             "password": {"write_only": True},
             "is_superuser": {"read_only": True},
             "is_staff": {"read_only": True},
+            "gdpr_accepted": {"read_only": True},
+            "gdpr_agreement_date": {"read_only": True},
+            "gdpr_ip": {"read_only": True},
             "user_role": {"required": True},
             "phone_number": {"required": True},
             "date_birth": {"required": False},
             "gender": {"required": False},
-            "company": {"required": False,},
+            "company": {
+                "required": False,
+            },
             "city": {"required": False},
             "address": {"required": False},
             "postcode": {"required": False},

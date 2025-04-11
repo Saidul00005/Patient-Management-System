@@ -332,13 +332,13 @@ const UserForm = () => {
       // .post("/api/user/")
       .then((res) => {
         console.log("res", res);
+        setError({});
         setMessage("User added successfully");
         setError();
         usernameRef.current.value = null;
         passwordRef.current.value = null;
         // cardNumberRef.current.value = null;
         if (cardNumberRef.current) cardNumberRef.current.value = null;
-        setRole("");
         nameRef.current.value = null;
         surnameRef.current.value = null;
         emailRef.current.value = null;
@@ -352,8 +352,6 @@ const UserForm = () => {
         if (addressRef.current) addressRef.current.value = null;
         if (postalRef.current) postalRef.current.value = null;
         if (gesyNumberRef.current) gesyNumberRef.current.value = null;
-
-        setError({});
         setPhone("+357"); // Reset phone input if needed
         setColor(""); // Reset color if applicable
       })
@@ -372,6 +370,35 @@ const UserForm = () => {
 
         setErrors(err.response?.data);
       });
+  };
+
+  const handleReset = () => {
+    setRole("");
+    setGender("");
+    setPhone("+357");
+    setColor("");
+    setError(undefined);
+    setMessage(undefined);
+    setErrors({});
+  
+    // Clear all refs if they exist
+    const refs = [
+      nameRef,
+      surnameRef,
+      dateRef,
+      usernameRef,
+      passwordRef,
+      emailRef,
+      addressRef,
+      gesyNumberRef,
+      postalRef,
+      cityRef,
+      cardNumberRef
+    ];
+  
+    refs.forEach((ref) => {
+      if (ref.current) ref.current.value = "";
+    });
   };
 
   const handleGenderChange = (event) => {
@@ -531,7 +558,10 @@ const UserForm = () => {
             />
             </>
             )}
-            <PhoneField phone={phone} setPhone={setPhone} required/>
+            <PhoneField phone={phone} setPhone={(val) => {
+              setPhone(val);
+            }} 
+            />
 
             {errors?.phone_number && (
               <Typography
@@ -557,7 +587,7 @@ const UserForm = () => {
               inputRef={cardNumberRef}
               onChange={(e) => setErrors({ ...errors, id_card: "" })}
             />
-            {errors?.id_card && (
+            {role !== "CLIENT" && errors?.id_card && (
               <Typography
                 sx={{ textAlign: "left", mb: 2 }}
                 color="error"
@@ -697,6 +727,15 @@ const UserForm = () => {
             color="primary"
           >
             {t("Submit")}
+          </Button>
+          <Button
+            sx={{ mb: 2, ml: 2 }}
+            type="button"
+            variant="outlined"
+            color="secondary"
+            onClick={handleReset}
+          >
+            {t("Reset")}
           </Button>
           {message && (
             <Typography variant="body1" color="green" gutterBottom>

@@ -28,7 +28,7 @@ export const ContextProvider = ({ children }) => {
     if (user) {
       localStorage.setItem("USER", JSON.stringify(user));
     } else {
-      localStorage.removeIte("USER");
+      localStorage.removeItem("USER");
     }
   };
 
