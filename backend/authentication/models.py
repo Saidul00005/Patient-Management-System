@@ -50,7 +50,7 @@ class CustomUser(AbstractUser):
     first_name =EncryptedCharField(max_length=100)
     last_name = EncryptedCharField(max_length=100)
     email = EncryptedCharField(max_length=256)
-    phone_number = PhoneNumberField(null=True, blank=True)
+    phone_number = PhoneNumberField(null=False, blank=False)
     gender =  EncryptedCharField(max_length=1, blank=True, choices=GENDER_CHOICE,null=True)
     date_birth = EncryptedDateField(blank=True, null=True)
 

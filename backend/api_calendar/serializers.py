@@ -156,7 +156,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         ]
     )
     date_birth = serializers.DateField(
-        required=False, format="%Y-%m-%d", input_formats=["%Y-%m-%d", "iso-8601"]
+        required=False, allow_null= True,format="%Y-%m-%d", input_formats=["%Y-%m-%d", "iso-8601"]
     )
 
     assigned_staff = serializers.SerializerMethodField()
@@ -209,16 +209,15 @@ class CustomUserSerializer(serializers.ModelSerializer):
         # if user_role == "CLIENT" and not id_card:
         #     raise serializers.ValidationError({"id_card": "Required field for clients"})
 
-        if user_role == "CLIENT":
-            if not phone_number:
-                raise serializers.ValidationError(
-                    {"phone_number": "Required field for patients"}
-                )
-        else:
-            if not validated_data.get("id_card"):
-                raise serializers.ValidationError(
-                    {"id_card": "Required field for doctors/secretaries"}
-                )
+        if not phone_number:
+            raise serializers.ValidationError(
+                {"phone_number": "Required field for all users"}
+            )
+
+        if user_role != "CLIENT" and not id_card:
+            raise serializers.ValidationError(
+                {"id_card": "Required field for doctors/secretaries"}
+            )
 
         return validated_data
 
@@ -274,6 +273,9 @@ class CustomUserSerializer(serializers.ModelSerializer):
             "is_superuser": {"read_only": True},
             "is_staff": {"read_only": True},
             "user_role": {"required": True},
+            "phone_number": {"required": True},
+            "date_birth": {"required": False},
+            "gender": {"required": False},
             "company": {"required": False,},
             "city": {"required": False},
             "address": {"required": False},

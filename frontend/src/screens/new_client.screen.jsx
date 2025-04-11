@@ -295,6 +295,10 @@ const UserForm = () => {
     // if (!phoneNumber.startsWith("+357")) {
     //   phoneNumber = "+357" + phoneNumber;
     // }
+    if (dateRef.current.value && !/^\d{4}-\d{2}-\d{2}$/.test(dateRef.current.value)) {
+      setErrors({...errors, date_birth: "Invalid date format. Use YYYY-MM-DD"});
+      return;
+    }
 
     const payload = {
       user_role: role,
@@ -303,11 +307,11 @@ const UserForm = () => {
       first_name: nameRef.current.value,
       last_name: surnameRef.current.value,
       email: emailRef.current.value,
-      date_birth: dateRef.current.value,
-      gender: gender,
+      date_birth: dateRef.current.value ||null,
+      gender: gender, 
       phone_number: phoneNumber,
       ...(role !== "CLIENT" && {
-        id_card: cardNumberRef.current?.value || "", 
+        id_card: cardNumberRef.current.value, 
         city: cityRef.current?.value || "",
         address: addressRef.current?.value || "",
         postcode: postalRef.current?.value || "",
@@ -481,11 +485,10 @@ const UserForm = () => {
               type="date"
               label={t("Date of Birth")}
               variant="outlined"
-              required
               InputLabelProps={{
-                sx: {
-                  "& .MuiFormLabel-asterisk": { color: "red" }
-                },
+                // sx: {
+                //   "& .MuiFormLabel-asterisk": { color: "red" }
+                // },
                 shrink: true 
               }}
               inputRef={dateRef}
